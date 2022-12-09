@@ -1,0 +1,2 @@
+SCAN_PATH = <path_to_where_you_want_the_code_cloned>
+RESULT_PATH = <path_to_store_scan_result>
