@@ -2,6 +2,7 @@ import subprocess
 import os
 import asyncio
 import json 
+from json2html import *
 
 # common scanner class for scanning repositories
 class CodeScanner:
@@ -33,15 +34,24 @@ class CodeScanner:
             print("error")
             return "failed"
 
-    # scan code using semgrep
+    # scan code using SemGrep
     def scanCode(self):
         try:
-            os.system('docker run --rm -v "'+self.path+'/'+self.repoName+':/src" returntocorp/semgrep semgrep --config=auto --output=output.json --json --verbose')
+            os.system('docker run --rm -v "'+self.path+'/'+self.repoName+':/src" returntocorp/semgrep semgrep --config=auto --output=output.json --json --verbose --max-target-bytes 15MB')
             os.system('mv '+self.path+'/'+self.repoName+'/output.json '+self.scanResultPath+'/'+self.repoName+'.json')
             return "success"
         except:
             print("error")
             return "failed"
+    
+    # generate HTML report
+    def generateReport(self):
+        f = open(str(self.scanResultPath+'/'+self.repoName+'.json'))
+        data = json.loads(f.read())
+        output = json2html.convert(json = data)
+        file = open(self.scanResultPath+'/'+self.repoName+'.html',"w")
+        file.write(output)
+        file.close()
 
     # delete the code to conserve memory
     def cleanUp(self):
