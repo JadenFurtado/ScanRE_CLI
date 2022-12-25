@@ -63,7 +63,7 @@ if __name__=='__main__':
         path = os.getenv("SCAN_PATH")
         if path is None:            
             exit("scan path cannot be null")
-        repoName = "smsf_service"
+        repoName = input("Enter the folder name")
         if repoName is None:
             exit("repo name cannot be null")
         scanResultPath = os.getenv("RESULT_PATH")
