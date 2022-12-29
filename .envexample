@@ -1,2 +1,5 @@
+SCAN_TYPE = <1_for_a_git_scan and_2_otherwise>
 SCAN_PATH = <path_to_where_you_want_the_code_cloned>
 RESULT_PATH = <path_to_store_scan_result>
+TARGETS_FILE = targets.txt
+PATHS_FILE = paths.txt

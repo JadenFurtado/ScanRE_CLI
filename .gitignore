@@ -161,3 +161,6 @@ cython_debug/
 
 # Don't push targets to github!
 targets.txt
+paths.txt
+Wordpress/
+list.txt

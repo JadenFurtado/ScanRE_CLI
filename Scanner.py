@@ -11,24 +11,29 @@ class CodeScanner:
         if repoLink is None:
             print("repoLink cannot be none")
         else:
-            self.repoLink=repoLink
+            self.repoLink = repoLink
         if path is None:
             print("scan path cannot be none")
         else:
-            self.path=path
+            # remove new line from the string
+            path = path.strip()
+            self.path = path
         if repoName is None:
             print("repo name cannot be none")
         else:
+            # remove new lines from the string
+            repoName = repoName.strip()
             self.repoName = repoName
         if scanResultPath is None:
             print("scan result path cannot be none")
         else:
             self.scanResultPath = scanResultPath
-    
+        # self.scanCode()
+        # self.generateReport()
     # clone code from source repository
-    def getCode(self):
+    async def getCode(self):
         try:
-            os.system('git clone '+self.repoLink+" "+self.path+"/"+self.repoName+"/")
+            await os.system('git clone '+self.repoLink+" "+self.path+"/"+self.repoName+"/ --depth 1")
             return "success"
         except:
             print("error")
@@ -37,20 +42,30 @@ class CodeScanner:
     # scan code using SemGrep
     def scanCode(self):
         try:
-            os.system('docker run --rm -v "'+self.path+'/'+self.repoName+':/src" returntocorp/semgrep semgrep --config=auto --output=output.json --json --verbose --max-target-bytes 15MB')
-            os.system('mv '+self.path+'/'+self.repoName+'/output.json '+self.scanResultPath+'/'+self.repoName+'.json')
+            #p = os.system('docker run --rm -v "'+self.path+'/'+self.repoName+':/src" returntocorp/semgrep semgrep --config=auto --output=output.json --json --verbose --max-target-bytes 15MB')
+            command = 'docker run --rm -v "'+self.path+'/'+self.repoName+':/src" returntocorp/semgrep semgrep --config=auto --output=output.json --json --verbose --max-target-bytes 15MB'
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+            process.wait()
             return "success"
         except:
             print("error")
             return "failed"
-    
+    # move the generated file
+    async def moveReport(self):
+        try:
+            await os.system('mv '+self.path+'/'+self.repoName+'/output.json '+self.scanResultPath+'/'+self.repoName+'.json')
+            return "success"
+        except:
+            print("error")
+            return "failed"
+
     # generate HTML report
-    def generateReport(self):
+    async def generateReport(self):
         f = open(str(self.scanResultPath+'/'+self.repoName+'.json'))
         data = json.loads(f.read())
         output = json2html.convert(json = data)
         file = open(self.scanResultPath+'/'+self.repoName+'.html',"w")
-        file.write(output)
+        await file.write(output)
         file.close()
 
     # delete the code to conserve memory
